@@ -21,7 +21,7 @@ class Node(BaseNode):
         from InputsConfig import InputsConfig as p
         for node in p.NODES:
             node.blockchain.append(Block())
-
+            
     # This to allow miners to include uncle blocks in their main blocks
     def add_uncles(miner):
         from InputsConfig import InputsConfig as p

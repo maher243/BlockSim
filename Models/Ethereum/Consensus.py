@@ -9,7 +9,7 @@ import random
 class Consensus(BaseConsensus):
 
 
-    """
+    """ 
 	We modelled PoW consensus protocol by drawing the time it takes the miner to finish the PoW from an exponential distribution
         based on the invested hash power (computing power) fraction
     """
@@ -20,7 +20,7 @@ class Consensus(BaseConsensus):
         return random.expovariate(hashPower * 1/p.Binterval)
 
 
-    """
+    """ 
 	This method apply the longest-chain approach to resolve the forks that occur when nodes have multiple differeing copies of the blockchain ledger
     """
     def fork_resolution():
@@ -51,3 +51,6 @@ class Consensus(BaseConsensus):
                 for bc in range(len(i.blockchain)):
                     BaseConsensus.global_chain.append(i.blockchain[bc])
                 break
+
+
+

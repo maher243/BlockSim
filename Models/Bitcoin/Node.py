@@ -10,3 +10,4 @@ class Node(BaseNode):
         self.transactionsPool= []
         self.blocks= 0# total number of blocks mined in the main chain
         self.balance= 0# to count all reward that a miner made, including block rewards + uncle rewards + transactions fees
+        

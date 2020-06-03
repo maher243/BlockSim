@@ -10,7 +10,7 @@ from sklearn.ensemble import RandomForestRegressor
 from InputsConfig import InputsConfig as p
 import pandas as pd
 
-""" A class to fit distribution to Ethereum transaction attributes, which are
+""" A class to fit distribution to Ethereum transaction attributes, which are 
     Gas Limit, Used Gas, Gas Price as well as CPU Time
 """
 class DistFit():
