@@ -5,7 +5,7 @@
 
 For more details about BlockSim, we refer to our journal paper that can be freely accessed online https://www.frontiersin.org/articles/10.3389/fbloc.2020.00028/full
 
-## Installtion and Requirements
+## Installation and Requirements
 
 Before you can use BlockSim  simulator, you need to have **Python version 3 or above** installed in your machine as well as have the following packages installed:
 
