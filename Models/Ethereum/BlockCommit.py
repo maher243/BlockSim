@@ -59,7 +59,7 @@ class BlockCommit(BaseBlockCommit):
         if blockPrev == lastBlockId:
             node.blockchain.append(event.block) # append the block to local blockchain
 
-            if p.hasTrans and p.Ttechnique == "Full": BlockCommit.update_transactionsPool(node, event.block)
+            if p.hasTrans and p.Ttechnique == "Full": BaseBlockCommit.update_transactionsPool(node, event.block)
 
             BlockCommit.generate_next_block(node,currentTime)# Start mining or working on the next block
 
@@ -76,7 +76,7 @@ class BlockCommit(BaseBlockCommit):
                  node.unclechain.append(uncle)
 
             if p.hasUncles: BlockCommit.update_unclechain(node)
-            if p.hasTrans and p.Ttechnique == "Full": BlockCommit.update_transactionsPool(node,event.block) # not sure yet.
+            if p.hasTrans and p.Ttechnique == "Full": BaseBlockCommit.update_transactionsPool(node,event.block) # not sure yet.
 
     # Upon generating or receiving a block, the miner start working on the next block as in POW
     def generate_next_block(node,currentTime):
@@ -106,11 +106,11 @@ class BlockCommit(BaseBlockCommit):
                     node.unclechain.append(node.blockchain[i]) # move block to unclechain
                     newBlock = miner.blockchain[i]
                     node.blockchain[i]= newBlock
-                    if p.hasTrans and p.Ttechnique == "Full": Node.update_transactionsPool(node,newBlock)
+                    if p.hasTrans and p.Ttechnique == "Full": BaseBlockCommit.update_transactionsPool(node,newBlock)
             else:
                 newBlock = miner.blockchain[i]
                 node.blockchain.append(newBlock)
-                if p.hasTrans and p.Ttechnique == "Full": Node.update_transactionsPool(node,newBlock)
+                if p.hasTrans and p.Ttechnique == "Full": BaseBlockCommit.update_transactionsPool(node,newBlock)
             i+=1
 
     # Upon receiving a block, update local unclechain to remove all uncles included in the received block
