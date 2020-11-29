@@ -2,7 +2,7 @@ from Models.Ethereum.Distribution.DistFit import DistFit
 import random
 from InputsConfig import InputsConfig as p
 import numpy as np
-import Models.Network
+from Models.Network import Network
 import operator
 from Models.Ethereum.Distribution.DistFit import DistFit
 
@@ -49,15 +49,14 @@ class Transaction(object):
 
 class LightTransaction():
 
-    pending_transactions=[] # shared pool of pending transactions
+    pool=[] # shared pool of pending transactions
     #x=0 # counter to only fit distributions once during the simulation
 
     def create_transactions():
 
-        LightTransaction.pending_transactions=[]
-        pool= LightTransaction.pending_transactions
+        LightTransaction.pool=[]
         Psize= int(p.Tn * p.Binterval)
-        
+
         #if LightTransaction.x<1:
         DistFit.fit() # fit distributions
         gasLimit,usedGas,gasPrice,_ = DistFit.sample_transactions(Psize) # sampling gas based attributes for transactions from specific distribution
@@ -74,10 +73,10 @@ class LightTransaction():
             tx.gasPrice=gasPrice[i]/1000000000
             tx.fee= tx.usedGas * tx.gasPrice
 
-            pool += [tx]
+            LightTransaction.pool += [tx]
 
 
-        random.shuffle(pool)
+        random.shuffle(LightTransaction.pool)
 
 
     ##### Select and execute a number of transactions to be added in the next block #####
@@ -85,10 +84,9 @@ class LightTransaction():
         transactions= [] # prepare a list of transactions to be included in the block
         limit = 0 # calculate the total block gaslimit
         count=0
-        blocklimit = p.Bsize
-        pool= LightTransaction.pending_transactions
+        blocklimit = p.Blimit
 
-        pool = sorted(pool, key=lambda x: x.gasPrice, reverse=True) # sort pending transactions in the pool based on the gasPrice value
+        pool = sorted(LightTransaction.pool, key=lambda x: x.gasPrice, reverse=True) # sort pending transactions in the pool based on the gasPrice value
 
         while count < len(pool):
                 if  (blocklimit >= pool[count].gasLimit):
@@ -103,9 +101,9 @@ class FullTransaction():
     x=0 # counter to only fit distributions once during the simulation
 
     def create_transactions():
-        Psize= int(p.Tn * p.simTime)
+        Psize= int(p.Tn * p.Binterval)
 
-        if LightTransaction.x<1:
+        if FullTransaction.x<1:
             DistFit.fit() # fit distributions
         gasLimit,usedGas,gasPrice,_ = DistFit.sample_transactions(Psize) # sampling gas based attributes for transactions from specific distribution
 
@@ -124,7 +122,7 @@ class FullTransaction():
             tx.usedGas=usedGas[i]
             tx.gasPrice=gasPrice[i]/1000000000
             tx.fee= tx.usedGas * tx.gasPrice
-            
+
             sender.transactionsPool.append(tx)
             FullTransaction.transaction_prop(tx)
 
@@ -143,7 +141,7 @@ class FullTransaction():
         transactions= [] # prepare a list of transactions to be included in the block
         limit = 0 # calculate the total block gaslimit
         count=0
-        blocklimit = p.Bsize
+        blocklimit = p.Blimit
         miner.transactionsPool.sort(key=operator.attrgetter('gasPrice'), reverse=True)
         pool= miner.transactionsPool
 
