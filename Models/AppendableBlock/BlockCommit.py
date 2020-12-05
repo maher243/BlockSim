@@ -96,7 +96,7 @@ class BlockCommit(BaseBlockCommit):
     def generate_initial_events():
         for gateway_id in p.GATEWAYIDS:
             for node in p.NODES:
-                Scheduler.create_block_event(node, 0, gateway_id)
+                Scheduler.create_block_event_AB(node, 0, gateway_id)
 
     # Checks if all the transactions are processed
     def transcations_procesed():
