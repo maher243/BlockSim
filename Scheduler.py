@@ -38,7 +38,7 @@ class Scheduler:
             Queue.add_event(e)
 
     # Schedule a block creation event for a gateway - AppendableBlock model
-    def create_block_event(node, eventTime, receiverGatewayId):
+    def create_block_event_AB(node, eventTime, receiverGatewayId):
         eventType = "create_block"
         if eventTime <= p.simTime:
             # Populate event attributes
