@@ -5,7 +5,7 @@ class InputsConfig:
     0 : The base model
     1 : Bitcoin model
     2 : Ethereum model
-        3 : AppendableBlock model
+    3 : AppendableBlock model
     """
     model = 1
 
@@ -58,15 +58,32 @@ class InputsConfig:
 
         ''' Node Parameters '''
         Nn = 3  # the total number of nodes in the network
-        NODES = []
         from Models.Bitcoin.Node import Node
+        from Models.Bitcoin.Pool import Pool
+
+        POOLS = [Pool(_id=0, strategy='PPS', fee=3), Pool(_id=1, strategy='FPPS', fee=1), Pool(_id=2, strategy='PPS+', fee=1)]
+
         # here as an example we define three nodes by assigning a unique id for each one + % of hash (computing) power
-        NODES = [Node(id=0, hashPower=50), Node(
-            id=1, hashPower=20), Node(id=2, hashPower=30)]
+        NODES = [
+            Node(id=0, pool=POOLS[0], hashPower=25),
+            Node(id=1, pool=POOLS[1], hashPower=10),
+            Node(id=2, pool=POOLS[2], hashPower=15),
+            Node(id=3, pool=POOLS[0], hashPower=25),
+            Node(id=4, pool=POOLS[1], hashPower=10),
+            Node(id=5, pool=POOLS[2], hashPower=10),
+            Node(id=6, hashPower=5)
+        ]
+
+        for pool in POOLS:
+            for node in NODES:
+                if node.pool == pool:
+                    pool.nodes.append(node)
+                    pool.hashPower += node.hashPower
+            # print(pool.__dict__)
 
         ''' Simulation Parameters '''
         simTime = 10000  # the simulation length (in seconds)
-        Runs = 2  # Number of simulation runs
+        Runs = 3  # Number of simulation runs
 
     ''' Input configurations for Ethereum model '''
     if model == 2:
@@ -108,7 +125,7 @@ class InputsConfig:
         simTime = 500  # the simulation length (in seconds)
         Runs = 2  # Number of simulation runs
 
-        ''' Input configurations for AppendableBlock model '''
+    ''' Input configurations for AppendableBlock model '''
     if model == 3:
         ''' Transaction Parameters '''
         hasTrans = True  # True/False to enable/disable transactions in the simulator

@@ -45,7 +45,7 @@ class Statistics:
 
         for m in p.NODES:
             i = run_id * len(p.NODES) + m.id
-            Statistics.profits[i] += [run_id, m.id]
+            Statistics.profits[i] += [run_id, m.id, m.pool.strategy if m.pool else 'SOLO']
             if p.model== 0:
                 Statistics.profits[i].append("NA")
             else:
@@ -84,10 +84,9 @@ class Statistics:
         df2.columns= ['Run ID', 'Total Blocks', 'Main Blocks', 'Uncle blocks', 'Uncle Rate', 'Stale Blocks', 'Stale Rate', '# transactions']
 
         df3 = pd.DataFrame(Statistics.profits)
-        df3.columns = ['Run ID', 'Miner ID', '% Hash Power','# Mined Blocks', '% of main blocks', '# Uncle Blocks','% of uncles', 'Fee', 'Profit (in crypto)', 'Profit in $']
+        df3.columns = ['Run ID', 'Miner ID', 'Pool Strategy', '% Hash Power','# Mined Blocks', '% of main blocks', '# Uncle Blocks','% of uncles', 'Fee', 'Profit (in crypto)', 'Profit in $']
 
         df4 = pd.DataFrame(Statistics.chain)
-        #df4.columns= ['Block Depth', 'Block ID', 'Previous Block', 'Block Timestamp', 'Miner ID', '# transactions','Block Size']
         if p.model==2:
             df4.columns= ['Run ID', 'Block Depth', 'Block ID', 'Previous Block', 'Block Timestamp', 'Miner ID', '# transactions', 'Fee', 'Block Limit', 'Uncle Blocks']
         else:
