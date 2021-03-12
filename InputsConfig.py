@@ -7,7 +7,7 @@ class InputsConfig:
     2 : Ethereum model
         3 : AppendableBlock model
     """
-    model = 3
+    model = 1
 
     ''' Input configurations for the base model '''
     if model == 0:
@@ -44,7 +44,8 @@ class InputsConfig:
         Binterval = 600  # Average time (in seconds)for creating a block in the blockchain
         Bsize = 1.0  # The block size in MB
         Bdelay = 0.42  # average block propogation delay in seconds, #Ref: https://bitslog.wordpress.com/2016/04/28/uncle-mining-an-ethereum-consensus-protocol-flaw/
-        Breward = 12.5  # Reward for mining a block
+        Breward = 6.25  # Reward for mining a block
+        Bprice = 54000
 
         ''' Transaction Parameters '''
         hasTrans = True  # True/False to enable/disable transactions in the simulator
