@@ -28,14 +28,13 @@ class Incentives:
                     m.pool.balance += m.pool.fee/100 * reward
 
                     if bc.miner == m.id:
-                        m.pool.fee += bc.fee
                         m.pool.balance += bc.fee
 
                 elif m.pool.strategy == 'FPPS':
 
                     if bc.miner == m.id:
                         reward = p.Breward
-                        m.pool.fee += m.pool.fee/100 * reward
+                        m.pool.balance += m.pool.fee/100 * reward
                         reward = (100 - m.pool.fee)/100 * reward
 
                         for node in m.pool.nodes:
