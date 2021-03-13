@@ -61,7 +61,7 @@ class InputsConfig:
         from Models.Bitcoin.Node import Node
         from Models.Bitcoin.Pool import Pool
 
-        POOLS = [Pool(_id=0, strategy='PPS', fee=3), Pool(_id=1, strategy='FPPS', fee=1), Pool(_id=2, strategy='PPS+', fee=1)]
+        POOLS = [Pool(_id=0, strategy='PPS', fee_rate=3), Pool(_id=1, strategy='FPPS', fee_rate=1), Pool(_id=2, strategy='PPS+', fee_rate=1)]
 
         # here as an example we define three nodes by assigning a unique id for each one + % of hash (computing) power
         NODES = [

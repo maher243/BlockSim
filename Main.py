@@ -25,6 +25,7 @@ elif p.model == 1:
     from Models.Bitcoin.Consensus import Consensus
     from Models.Transaction import LightTransaction as LT, FullTransaction as FT
     from Models.Bitcoin.Node import Node
+    from Models.Bitcoin.Pool import Pool
     from Models.Incentives import Incentives
 
 elif p.model == 0:
@@ -77,6 +78,7 @@ def main():
             ########## reset all global variable before the next run #############
             Statistics.reset()  # reset all variables used to calculate the results
             Node.resetState()  # reset all the states (blockchains) for all nodes in the network
+            Pool.resetState()  # reset all pools in the network
 
     fname = f"(Allverify)1day_{p.Bsize/1000000}M_{p.Tn/1000}K-{i}-{datetime.now()}.xlsx"
     # print all the simulation results in an excel file
