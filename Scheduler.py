@@ -1,8 +1,7 @@
 from InputsConfig import InputsConfig as p
 import random
-from Models.Block import Block
 from Event import Event, Queue
-
+from Node import Node
 if p.model == 2:
     from Models.Ethereum.Block import Block
 elif p.model == 3:
@@ -70,3 +69,31 @@ class Scheduler:
             block.timestamp = tokenTime
             event = Event(eventType, gatewayId, eventTime, block)
             Queue.add_event(event)
+
+
+
+    def create_change_pool_event(node, eventTime):
+        eventType = "change_pool"
+        if eventTime <= p.simTime:
+            node.joinTime = eventTime
+            if node.node_strategy == "random":
+                while True:
+                    temp_pool = node.pool
+                    choosePool = random.randint(0, len(p.POOLS))
+                    node.pool = p.POOLS[choosePool]
+                    Queue.add_event(Event(eventType, node, eventTime))
+                    if node.pool != temp_pool:
+                        break
+
+
+            elif node.node_strategy == "sequential":
+                pool_index = p.POOLS.index(node.pool)
+                pool_index = (pool_index + 1)%len(p.POOLS)
+                node.pool = p.POOLS[pool_index]
+                Queue.add_event(Event(eventType, node, eventTime))
+
+
+            # elif node.node_strategy == 'strategy_based':
+            #     pool_index = p.POOLS.index(node.pool)
+
+

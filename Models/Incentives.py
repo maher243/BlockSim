@@ -22,10 +22,9 @@ class Incentives:
 
                     reward = m.hashPower/100 * p.Breward
                     # constant payout after deducting pool fee
-                    m.balance -= m.pool.fee_rate/100 * reward
-                    m.pool.balance += m.pool.fee_rate/100 * reward
-                    m.pool.balance -= (100 - m.pool.fee_rate)/100 * reward
-                    m.balance += (100 - m.pool.fee_rate)/100 * reward
+                    reward = (100 - m.pool.fee_rate)/100 * reward
+                    m.pool.balance -= reward
+                    m.balance += reward
 
                     if bc.miner == m.id:
                         m.blocks += 1
@@ -54,12 +53,10 @@ class Incentives:
                 elif m.pool.strategy == 'PPS+':
 
                     reward = m.hashPower/100 * p.Breward
-
+                    reward = (100 - m.pool.fee_rate)/100 * reward
                     # constant payout after deducting pool fee
-                    m.balance -= m.pool.fee_rate/100 * reward
-                    m.pool.balance += m.pool.fee_rate/100 * reward
-                    m.pool.balance -= (100 - m.pool.fee_rate)/100 * reward
-                    m.balance += (100 - m.pool.fee_rate)/100 * reward
+                    m.pool.balance -= reward
+                    m.balance += reward
 
                     # transaction fee shared by all nodes
                     if bc.miner == m.id:

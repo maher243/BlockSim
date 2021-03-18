@@ -46,6 +46,7 @@ class InputsConfig:
         Bdelay = 0.42  # average block propogation delay in seconds, #Ref: https://bitslog.wordpress.com/2016/04/28/uncle-mining-an-ethereum-consensus-protocol-flaw/
         Breward = 6.25  # Reward for mining a block
         Bprice = 54000
+        jump_threshold = 0.02
 
         ''' Transaction Parameters '''
         hasTrans = True  # True/False to enable/disable transactions in the simulator
@@ -61,7 +62,12 @@ class InputsConfig:
         from Models.Bitcoin.Node import Node
         from Models.Bitcoin.Pool import Pool
 
-        POOLS = [Pool(_id=0, strategy='PPS', fee_rate=3), Pool(_id=1, strategy='FPPS', fee_rate=1), Pool(_id=2, strategy='PPS+', fee_rate=1)]
+        # Creating the mining pools
+        POOLS = [
+            Pool(_id=0, strategy='PPS', fee_rate=3),
+            Pool(_id=1, strategy='FPPS', fee_rate=1),
+            Pool(_id=2, strategy='PPS+', fee_rate=1)
+        ]
 
         # here as an example we define three nodes by assigning a unique id for each one + % of hash (computing) power
         NODES = [
@@ -74,12 +80,10 @@ class InputsConfig:
             Node(id=6, hashPower=5)
         ]
 
-        for pool in POOLS:
-            for node in NODES:
-                if node.pool == pool:
-                    pool.nodes.append(node)
-                    pool.hashPower += node.hashPower
-            # print(pool.__dict__)
+        # Giving every pool a reference to the nodes it contains. Also, update the total hashrate of a pool.
+        for node in NODES:
+            node.pool.nodes.append(node)
+            node.pool.hashPower += node.hashPower
 
         ''' Simulation Parameters '''
         simTime = 10000  # the simulation length (in seconds)
