@@ -82,8 +82,9 @@ class InputsConfig:
 
         # Giving every pool a reference to the nodes it contains. Also, update the total hashrate of a pool.
         for node in NODES:
-            node.pool.nodes.append(node)
-            node.pool.hashPower += node.hashPower
+            if node.pool is not None:
+                node.pool.nodes.append(node)
+                node.pool.hashPower += node.hashPower
 
         ''' Simulation Parameters '''
         simTime = 10000  # the simulation length (in seconds)
