@@ -1,6 +1,6 @@
 class Pool():
 
-    def __init__(self, _id, strategy, fee_rate):
+    def __init__(self, _id, strategy, fee_rate, block_window=None):
         self.id = _id
         self.strategy = strategy
         self.fee_rate = fee_rate
@@ -9,6 +9,7 @@ class Pool():
         self.blocks = 0
         self.block_fee = 0
         self.balance = 0
+        self.block_window = block_window
 
     def resetState():
         from InputsConfig import InputsConfig as p

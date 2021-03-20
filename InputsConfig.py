@@ -66,18 +66,23 @@ class InputsConfig:
         POOLS = [
             Pool(_id=0, strategy='PPS', fee_rate=3),
             Pool(_id=1, strategy='FPPS', fee_rate=1),
-            Pool(_id=2, strategy='PPS+', fee_rate=1)
+            Pool(_id=2, strategy='PPS+', fee_rate=1),
+            Pool(_id=3, strategy='PPLNS', fee_rate=1, block_window=8),
+            Pool(_id=4, strategy='PPLNS', fee_rate=2, block_window=6),
         ]
 
         # here as an example we define three nodes by assigning a unique id for each one + % of hash (computing) power
         NODES = [
             Node(id=0, pool=POOLS[0], hashPower=25),
-            Node(id=1, pool=POOLS[1], hashPower=10),
+            Node(id=1, pool=POOLS[1], hashPower=5),
             Node(id=2, pool=POOLS[2], hashPower=15),
-            Node(id=3, pool=POOLS[0], hashPower=25),
+            Node(id=3, pool=POOLS[3], hashPower=15),
             Node(id=4, pool=POOLS[1], hashPower=10),
-            Node(id=5, pool=POOLS[2], hashPower=10),
-            Node(id=6, hashPower=5)
+            Node(id=5, pool=POOLS[4], hashPower=10),
+            Node(id=6, pool=POOLS[4], hashPower=5),
+            Node(id=7, pool=POOLS[3], hashPower=5),
+            Node(id=8, pool=POOLS[3], hashPower=5),
+            Node(id=9, hashPower=5)
         ]
 
         # Giving every pool a reference to the nodes it contains. Also, update the total hashrate of a pool.
