@@ -66,7 +66,7 @@ class InputsConfig:
         POOLS = [
             Pool(_id=0, strategy='PPS', fee_rate=3),
             Pool(_id=1, strategy='FPPS', fee_rate=1),
-            Pool(_id=2, strategy='PPS+', fee_rate=1),
+            Pool(_id=2, strategy='PPS+', fee_rate=1, block_window=8),
             Pool(_id=3, strategy='PPLNS', fee_rate=1, block_window=8),
             Pool(_id=4, strategy='PPLNS', fee_rate=2, block_window=6),
         ]

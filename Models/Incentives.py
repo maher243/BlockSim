@@ -9,13 +9,25 @@ class Incentives:
     Defines the rewarded elements (block + transactions), calculate and distribute the rewards among the participating nodes
     """
     def distribute_rewards():
-        for i, bc in enumerate(c.global_chain):
-            
+        for i, bc in enumerate(c.global_chain[1:]):
+
             current_time = bc.timestamp
 
+            miner = p.NODES[bc.miner]
+            miner.blocks += 1
+
+            if miner.pool:
+                miner_pool = miner.pool
+                miner_pool.blocks += 1
+                miner.blocks_list[-1] += 1
+                # pool gets block reward
+                miner_pool.balance += p.Breward
+
+
+            windows = {}
             cumulative_times = {}
             for pool in p.POOLS:
-                if pool.strategy != 'PPLNS':
+                if pool.strategy not in ['PPLNS', 'PPS+']:
                     continue
 
                 N = pool.block_window
@@ -23,23 +35,24 @@ class Incentives:
                     window_timestamp = c.global_chain[i-N-1].timestamp
                 else:
                     window_timestamp = 0
-                        
+
                 resource = 0
                 for pool_node in pool.nodes:
-                    minimum_window_time = min(current_time - pool_node.joinTime, current_time - window_timestamp)
-                    resource +=  minimum_window_time * pool_node.hashPower
-                
+                    latest_window_time = max(pool_node.joinTime, window_timestamp)
+                    resource += (current_time - latest_window_time) * pool_node.hashPower
+
+                windows[pool] = window_timestamp
                 cumulative_times[pool] = resource
 
 
             for m in p.NODES:
 
                 if not m.pool:
-                    if bc.miner == m.id:
-                        m.blocks += 1
+                    if miner == m:
                         m.balance += p.Breward  # increase the miner balance by the block reward
                         m.fee += bc.fee
                         m.balance += bc.fee  # add transaction fees to balance
+
 
                 elif m.pool.strategy == 'PPS':
 
@@ -49,81 +62,98 @@ class Incentives:
                     m.pool.balance -= reward
                     m.balance += reward
 
-                    if bc.miner == m.id:
-                        m.blocks += 1
-                        m.pool.blocks += 1
-                        # pool keeps block reward and transaction fee
-                        m.pool.balance += p.Breward
-                        m.pool.block_fee += bc.fee
-                        m.pool.balance += bc.fee
+                    if miner == m:
+                        # pool keeps transaction fee
+                        miner_pool.block_fee += bc.fee
+                        miner_pool.balance += bc.fee
+
+
+                elif m.pool.strategy == 'FPPS':
+
+                    reward = m.hashPower/100 * p.Breward
+                    # constant payout after deducting pool fee
+                    reward = (100 - m.pool.fee_rate)/100 * reward
+                    m.pool.balance -= reward
+                    m.balance += reward
+
+                    # expected transaction fee also paid out at each block
+                    fee = m.hashPower/100 * bc.fee
+                    m.pool.balance -= fee
+                    m.fee += fee
+                    m.balance = fee
+
+                    if miner == m:
+                        # pool gets transaction fee in case block found
+                        miner_pool.block_fee += bc.fee
+                        miner_pool.balance += bc.fee
+
 
                 elif m.pool.strategy == 'PPLNS':
-                    
-                    if bc.miner == m.id:
-                        m.blocks += 1
-                        m.pool.blocks += 1
 
-                        reward = (100 - m.pool.fee_rate)/100 * p.Breward
-                        m.pool.balance += m.pool.fee_rate/100 * p.Breward
+                    # payout only occurs in case pool finds the block
+                    if miner == m:
+                        # reward to be distributed after deducting pool fee
+                        reward = (100 - miner_pool.fee_rate)/100 * p.Breward
+                        miner_pool.balance -= reward
 
-                        print('check')
-                        for node in m.pool.nodes:
-                            N = m.pool.block_window
-                            if i > N:
-                                window_timestamp = c.global_chain[i-N-1].timestamp
-                            else:
-                                window_timestamp = 0
-                            
-                            minimum_window_time = min(current_time - node.joinTime, current_time - window_timestamp)
-                            
-                            frac = (minimum_window_time * node.hashPower)/cumulative_times[m.pool]
-                            print(frac)
+                        # print('check')
+                        for node in miner_pool.nodes:
+
+                            latest_window_time = max(node.joinTime, windows[miner_pool])
+                            frac = (current_time - latest_window_time) * node.hashPower/cumulative_times[miner_pool]
+                            # print(frac)
+                            # transaction fee and reward distributed as per fraction of time and hashpower spent
                             node.balance += frac * reward
                             node.fee += frac * bc.fee
                             node.balance += frac * bc.fee
 
 
-                elif m.pool.strategy == 'FPPS':
+                # elif m.pool.strategy == 'FPPS':
 
-                    if bc.miner == m.id:
-                        m.blocks += 1
-                        m.pool.blocks += 1
-                        # deducting pool fee
-                        reward = (100 - m.pool.fee_rate)/100 * p.Breward
-                        m.pool.balance += m.pool.fee_rate/100 * p.Breward
+                #     if bc.miner == m.id:
+                #         m.blocks += 1
+                #         m.pool.blocks += 1
+                #         # deducting pool fee
+                #         reward = (100 - m.pool.fee_rate)/100 * p.Breward
+                #         m.pool.balance += m.pool.fee_rate/100 * p.Breward
 
-                        # all nodes share block reward and transaction fee
-                        for node in m.pool.nodes:
-                            node.balance += node.hashPower/m.pool.hashPower * reward
-                            node_fee = node.hashPower/m.pool.hashPower * bc.fee
-                            node.fee += node_fee
-                            node.balance += node_fee
+                #         # all nodes share block reward and transaction fee
+                #         for node in m.pool.nodes:
+                #             node.balance += node.hashPower/m.pool.hashPower * reward
+                #             node_fee = node.hashPower/m.pool.hashPower * bc.fee
+                #             node.fee += node_fee
+                #             node.balance += node_fee
+
 
                 elif m.pool.strategy == 'PPS+':
 
                     reward = m.hashPower/100 * p.Breward
+                    # constant payout after deducting pool fee (PPS)
                     reward = (100 - m.pool.fee_rate)/100 * reward
-                    # constant payout after deducting pool fee
                     m.pool.balance -= reward
                     m.balance += reward
 
-                    # transaction fee shared by all nodes
-                    if bc.miner == m.id:
-                        m.blocks += 1
-                        m.pool.blocks += 1
-                        # pool keeps block reward while the transaction fee is shared
-                        m.pool.balance += p.Breward
-                        for node in m.pool.nodes:
-                            node.fee += node.hashPower/m.pool.hashPower * bc.fee
-                            node.balance += node.hashPower/m.pool.hashPower * bc.fee
+                    if miner == m:
+
+                        # print('check2')
+                        for node in miner_pool.nodes:
+
+                            latest_window_time = max(node.joinTime, windows[miner_pool])
+                            frac = (current_time - latest_window_time) * node.hashPower/cumulative_times[miner_pool]
+                            # print(frac)
+                            # transaction fee shared by PPLNS method as per fraction of time and hashpower
+                            node.fee += frac * bc.fee
+                            node.balance += frac * bc.fee
 
 
-
+            # pool hopping
             for node in p.NODES:
                 if node.node_type == 'selfish':
                     if random.random() < jump_threshold:
-                        
-                        node.joinTime = current_time  # TODO improve time assignment
+
+                        print('jumping...')
+                        node.pool.hashPower -= node.hashPower
+                        node.pool.nodes.remove(node)
 
                         if node.node_strategy == "random":
                             while True:
@@ -139,3 +169,9 @@ class Incentives:
                             node.pool = p.POOLS[pool_index]
 
                         # elif node.node_strategy == 'strategy_based'
+
+                        node.joinTime = current_time  # TODO improve time assignment
+                        node.pool.hashPower += node.hashPower
+                        node.pool.nodes.append(node)
+                        node.pool_list.append(node.pool.id)
+                        node.blocks_list.append(0)
