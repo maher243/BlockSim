@@ -10,7 +10,7 @@ class Node(object):
         :param int blocks: the total number of blocks mined in the main chain
         :param int balance: the amount of cryptocurrencies a node has
     """
-    def __init__(self, id, pool):
+    def __init__(self, id, pool, joinTime):
         self.id= id
         self.blockchain= []
         self.transactionsPool= []
@@ -18,6 +18,7 @@ class Node(object):
         self.fee = 0
         self.balance= 0
         self.pool = pool
+        self.joinTime = joinTime
 
     # Generate the Genesis block and append it to the local blockchain for all nodes
     def generate_gensis_block():
