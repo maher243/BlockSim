@@ -146,31 +146,43 @@ class Incentives:
                             node.balance += frac * bc.fee
 
 
+            avg_payout = 0
+            pool_payout = {}
+            print()
+            for pool in p.POOLS:
+                print('pool', pool.id, [node.id for node in pool.nodes])
+                if pool.nodes and pool.strategy in ['PPS', 'PPLNS']:
+                    mu = ((100 - pool.fee_rate)/100) * ((p.Breward + p.Tfee * 6000)/len(pool.nodes)) * pool.hashPower/100
+                    pool_payout[pool] = mu
+                    avg_payout += mu
+
+            avg_payout /= len(pool_payout)
+
             # pool hopping
             for node in p.NODES:
-                if node.node_type == 'selfish':
-                    if random.random() < jump_threshold:
+                if node.node_type == 'selfish' and node.pool.strategy in ['PPS', 'PPLNS']:
 
-                        print('jumping...')
+                    mu = pool_payout[node.pool]
+
+                    if mu < avg_payout and random.random() < (avg_payout - mu)/avg_payout:
+                        print('jumping...', node.id)
+
                         node.pool.hashPower -= node.hashPower
                         node.pool.nodes.remove(node)
 
-                        if node.node_strategy == "random":
-                            while True:
-                                temp_pool = node.pool
-                                choosePool = random.randint(0, len(p.POOLS))
-                                node.pool = p.POOLS[choosePool]
-                                if node.pool != temp_pool:
-                                    break
+                        if node.node_strategy == "strategy_based":
+                            strategy_pools = [pool for pool in p.POOLS if pool.strategy == node.pool.strategy and pool != node.pool]
+                            choosenPool = random.randint(0, len(strategy_pools) - 1)
+                            node.pool = strategy_pools[choosenPool]
 
-                        elif node.node_strategy == "sequential":
-                            pool_index = p.POOLS.index(node.pool)
-                            pool_index = (pool_index + 1)%len(p.POOLS)
-                            node.pool = p.POOLS[pool_index]
+                        elif node.node_strategy == "across_strategies":
+                            strategy_pools = [pool for pool in p.POOLS if pool.strategy in ['PPS', 'PPLNS'] and pool != node.pool]
+                            choosenPool = random.randint(0, len(strategy_pools) - 1)
+                            node.pool = strategy_pools[choosenPool]
 
-                        # elif node.node_strategy == 'strategy_based'
-
-                        node.joinTime = current_time  # TODO improve time assignment
+                        # c.global_chain[i-1].timestamp + 0.432 * random.expovariate(hashPower * 1/p.Binterval)  # TODO improve time assignment
+                        # TODO random delay
+                        node.joinTime = current_time
                         node.pool.hashPower += node.hashPower
                         node.pool.nodes.append(node)
                         node.pool_list.append(node.pool.id)

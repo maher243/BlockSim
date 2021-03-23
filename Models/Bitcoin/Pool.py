@@ -17,3 +17,10 @@ class Pool():
             pool.blocks = 0  # total number of blocks mined in the main chain
             pool.block_fee = 0  # total transaction fee recieved from mined block
             pool.balance = 0  # to count all reward that a miner made
+            pool.nodes = []
+            pool.hashPower = 0
+
+        for node in p.NODES:
+            if node.pool:
+                node.pool.nodes.append(node)
+                node.pool.hashPower += node.hashPower

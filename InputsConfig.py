@@ -65,24 +65,36 @@ class InputsConfig:
         # Creating the mining pools
         POOLS = [
             Pool(_id=0, strategy='PPS', fee_rate=3),
-            Pool(_id=1, strategy='FPPS', fee_rate=1),
-            Pool(_id=2, strategy='PPS+', fee_rate=1, block_window=8),
+            Pool(_id=1, strategy='FPPS', fee_rate=3),
+            Pool(_id=2, strategy='PPS+', fee_rate=3, block_window=8),
             Pool(_id=3, strategy='PPLNS', fee_rate=1, block_window=8),
             Pool(_id=4, strategy='PPLNS', fee_rate=2, block_window=6),
+            Pool(_id=5, strategy='PPS', fee_rate=3),
+            Pool(_id=6, strategy='FPPS', fee_rate=4),
+            Pool(_id=7, strategy='PPS+', fee_rate=1, block_window=10),
         ]
 
         # here as an example we define three nodes by assigning a unique id for each one + % of hash (computing) power
         NODES = [
-            Node(id=0, pool=POOLS[0], hashPower=25),
+            Node(id=0, pool=POOLS[0], hashPower=12),
             Node(id=1, pool=POOLS[1], hashPower=5),
-            Node(id=2, pool=POOLS[2], hashPower=15),
-            Node(id=3, pool=POOLS[3], hashPower=15),
-            Node(id=4, pool=POOLS[1], hashPower=10),
+            Node(id=2, pool=POOLS[2], hashPower=5),
+            Node(id=3, pool=POOLS[6], hashPower=12),
+            Node(id=4, pool=POOLS[7], hashPower=5),
             Node(id=5, pool=POOLS[4], hashPower=10),
             Node(id=6, pool=POOLS[4], hashPower=5),
             Node(id=7, pool=POOLS[3], hashPower=5),
-            Node(id=8, pool=POOLS[3], hashPower=5),
-            Node(id=9, hashPower=5)
+            Node(id=8, pool=POOLS[6], hashPower=5),
+            Node(id=9, pool=POOLS[0], hashPower=7, node_type='selfish', node_strategy='strategy_based'),
+            Node(id=10, pool=POOLS[3], hashPower=6, node_type='selfish', node_strategy='strategy_based'),
+            Node(id=11, pool=POOLS[4], hashPower=8, node_type='selfish', node_strategy='strategy_based'),
+            Node(id=12, pool=POOLS[5], hashPower=5, node_type='selfish', node_strategy='strategy_based'),
+            Node(id=13, pool=POOLS[7], hashPower=2),
+            Node(id=14, pool=POOLS[1], hashPower=3),
+            Node(id=15, hashPower=1),
+            Node(id=16, hashPower=1),
+            Node(id=17, hashPower=1),
+            Node(id=18, hashPower=2)
         ]
 
         # Giving every pool a reference to the nodes it contains. Also, update the total hashrate of a pool.
@@ -92,7 +104,7 @@ class InputsConfig:
                 node.pool.hashPower += node.hashPower
 
         ''' Simulation Parameters '''
-        simTime = 10000  # the simulation length (in seconds)
+        simTime = 24 * 60 * 60  # the simulation length (in seconds)
         Runs = 3  # Number of simulation runs
 
     ''' Input configurations for Ethereum model '''
