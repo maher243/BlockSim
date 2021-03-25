@@ -40,6 +40,24 @@ elif p.model == 0:
 
 def main():
     for i in range(p.Runs):
+
+        hashPower = 0
+        # Giving every pool a reference to the nodes it contains. Also, update the total hashrate of a pool.
+        for node in p.NODES:
+            hashPower += node.hashPower
+            if node.pool:
+                node.pool.nodes.append(node)
+                node.pool.hashPower += node.hashPower
+
+        print()
+        print('-'*10, f'Run: {i+1}', '-'*10)
+        print('No. of Miners:', len(p.NODES))
+        print('Total hash power:', hashPower)
+        print('Pools:')
+        for pool in p.POOLS:
+            print(' -', pool.id, [node.id for node in pool.nodes], pool.hashPower)
+        print('\n')
+
         clock = 0  # set clock to 0 at the start of the simulation
         if p.hasTrans:
             if p.Ttechnique == "Light":

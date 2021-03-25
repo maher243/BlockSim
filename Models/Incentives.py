@@ -148,15 +148,16 @@ class Incentives:
 
             avg_payout = 0
             pool_payout = {}
-            print()
             for pool in p.POOLS:
-                print('pool', pool.id, [node.id for node in pool.nodes])
+                # print('pool', pool.id, [node.id for node in pool.nodes])
                 if pool.nodes and pool.strategy in ['PPS', 'PPLNS']:
-                    mu = ((100 - pool.fee_rate)/100) * ((p.Breward + p.Tfee * 6000)/len(pool.nodes)) * pool.hashPower/100
+                    mu = ((100 - pool.fee_rate)/100) * ((p.Breward + p.Tfee * 2000)/len(pool.nodes)) * pool.hashPower/100
                     pool_payout[pool] = mu
                     avg_payout += mu
 
             avg_payout /= len(pool_payout)
+            # print(avg_payout)
+            # print([(pool.id, pool.strategy, pay) for pool, pay in pool_payout.items()])
 
             # pool hopping
             for node in p.NODES:
@@ -165,7 +166,7 @@ class Incentives:
                     mu = pool_payout[node.pool]
 
                     if mu < avg_payout and random.random() < (avg_payout - mu)/avg_payout:
-                        print('jumping...', node.id)
+                        print(node.id, ':', node.pool.id, end=' ')
 
                         node.pool.hashPower -= node.hashPower
                         node.pool.nodes.remove(node)
@@ -186,4 +187,5 @@ class Incentives:
                         node.pool.hashPower += node.hashPower
                         node.pool.nodes.append(node)
                         node.pool_list.append(node.pool.id)
+                        print('--->', node.pool.id, [n.id for n in node.pool.nodes])
                         node.blocks_list.append(0)
