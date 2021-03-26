@@ -80,7 +80,7 @@ class Incentives:
                     fee = m.hashPower/100 * bc.fee
                     m.pool.balance -= fee
                     m.fee += fee
-                    m.balance = fee
+                    m.balance += fee
 
                     if miner == m:
                         # pool gets transaction fee in case block found
