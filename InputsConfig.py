@@ -1,3 +1,4 @@
+import random
 
 class InputsConfig:
 
@@ -62,43 +63,149 @@ class InputsConfig:
         from Models.Bitcoin.Node import Node
         from Models.Bitcoin.Pool import Pool
 
-        # Creating the mining pools
-        POOLS = [
-            Pool(_id=0, strategy='PPS', fee_rate=3),
-            Pool(_id=1, strategy='FPPS', fee_rate=3),
-            Pool(_id=2, strategy='PPS+', fee_rate=3, block_window=8),
-            Pool(_id=3, strategy='PPLNS', fee_rate=1, block_window=8),
-            Pool(_id=4, strategy='PPLNS', fee_rate=2, block_window=6),
-            Pool(_id=5, strategy='PPS', fee_rate=3),
-            Pool(_id=6, strategy='FPPS', fee_rate=4),
-            Pool(_id=7, strategy='PPS+', fee_rate=1, block_window=10),
-        ]
+        pool_types = {
+            'F2Pool': ('PPS+', 2),
+            'Poolin': ('PPS+', 2),
+            'BTC.com': ('FPPS', 2),
+            'AntPool': ('PPLNS', 2),
+            'Huobi': ('PPLNS', 1),
+            'Binance Pool': ('PPS', 3),
+            'ViaBTC': ('PPS', 4),
+            '1THash': ('FPPS', 4),
+            # 'OKExPool':,
+            # 'SlushPool': '',
+            # 'BTC Guild': 'PPLNS',
+            # 'GHash.IO':,
+            # 'BitFury':,
+            # 'BTCC': 'PPS'
+        }
 
-        # here as an example we define three nodes by assigning a unique id for each one + % of hash (computing) power
-        NODES = [
-            Node(id=0, pool=POOLS[0], hashPower=12),
-            Node(id=1, pool=POOLS[1], hashPower=5),
-            Node(id=2, pool=POOLS[2], hashPower=5),
-            Node(id=3, pool=POOLS[6], hashPower=12),
-            Node(id=4, pool=POOLS[7], hashPower=5),
-            Node(id=5, pool=POOLS[4], hashPower=10),
-            Node(id=6, pool=POOLS[4], hashPower=5),
-            Node(id=7, pool=POOLS[3], hashPower=5),
-            Node(id=8, pool=POOLS[6], hashPower=5),
-            Node(id=9, pool=POOLS[0], hashPower=7, node_type='selfish', node_strategy='strategy_based'),
-            Node(id=10, pool=POOLS[3], hashPower=6, node_type='selfish', node_strategy='strategy_based'),
-            Node(id=11, pool=POOLS[4], hashPower=8, node_type='selfish', node_strategy='strategy_based'),
-            Node(id=12, pool=POOLS[5], hashPower=5, node_type='selfish', node_strategy='strategy_based'),
-            Node(id=13, pool=POOLS[7], hashPower=2),
-            Node(id=14, pool=POOLS[1], hashPower=3),
-            Node(id=15, hashPower=1),
-            Node(id=16, hashPower=1),
-            Node(id=17, hashPower=1),
-        ]
+        NODES = []
+        POOLS = []
+        sim_type = 'baseline'
+        for pool, (strat, fee) in pool_types.items():
+            if strat in ['PPLNS', 'PPS+']:
+                POOLS.append(Pool(_id=pool, strategy=strat, fee_rate=fee, block_window=8))
+            else:
+                POOLS.append(Pool(_id=pool, strategy=strat, fee_rate=fee))
+
+        for i, pool in enumerate(POOLS):
+            NODES.append(
+            Node(id=i, pool=pool, hashPower=12.5))
+
+        # sim_type = 'solo'
+
+        # hp = 100
+        # for i in range(8):
+        #     hp /= 2
+        #     NODES.append(Node(id=i, hashPower=hp))
+
+        # sim_type = 'pps'
+
+        # for i, name in enumerate(pool_types):
+        #     POOLS.append(Pool(_id=name, strategy='PPS', fee_rate=i))
+
+        # hp = 100
+        # for i, pool in enumerate(POOLS):
+        #     hp /= 2
+        #     NODES.append(Node(id=i, pool=pool, hashPower=hp))
+
+        # sim_type = 'fpps'
+
+        # for i, name in enumerate(pool_types):
+        #     POOLS.append(Pool(_id=name, strategy='FPPS', fee_rate=i))
+
+        # hp = 100
+        # for i, pool in enumerate(POOLS):
+        #     hp /= 2
+        #     NODES.append(Node(id=i, pool=pool, hashPower=hp))
+
+        # sim_type = 'pplns'
+
+        # for i, name in enumerate(pool_types):
+        #     POOLS.append(Pool(_id=name, strategy='PPLNS', fee_rate=i, block_window=8))
+
+        # hp = 100
+        # for i, pool in enumerate(POOLS):
+        #     hp /= 2
+        #     NODES.append(Node(id=i, pool=pool, hashPower=hp))
+
+        # sim_type = 'pplns_windows'
+
+        # for i, name in enumerate(pool_types):
+        #     POOLS.append(Pool(_id=name, strategy='PPLNS', fee_rate=2, block_window=i+2))
+
+        # hp = 100
+        # for i, pool in enumerate(POOLS):
+        #     hp /= 2
+        #     NODES.append(Node(id=i, pool=pool, hashPower=hp))
+
+        # sim_type = 'pps+'
+
+        # for i, name in enumerate(pool_types):
+        #     POOLS.append(Pool(_id=name, strategy='PPS+', fee_rate=i, block_window=8))
+
+        # hp = 100
+        # for i, pool in enumerate(POOLS):
+        #     hp /= 2
+        #     NODES.append(Node(id=i, pool=pool, hashPower=hp))
+
+        # sim_type = 'pps+_windows'
+
+        # for i, name in enumerate(pool_types):
+        #     POOLS.append(Pool(_id=name, strategy='PPS+', fee_rate=3, block_window=i+2))
+
+        # hp = 100
+        # for i, pool in enumerate(POOLS):
+        #     hp /= 2
+        #     NODES.append(Node(id=i, pool=pool, hashPower=hp))
+
+
+        # Creating the mining pools
+        # POOLS = [
+        #     Pool(_id=0, strategy='PPS', fee_rate=3),
+        #     Pool(_id=1, strategy='FPPS', fee_rate=3),
+        #     Pool(_id=2, strategy='PPS+', fee_rate=3, block_window=8),
+        #     Pool(_id=3, strategy='PPLNS', fee_rate=1, block_window=8),
+        #     Pool(_id=4, strategy='PPLNS', fee_rate=2, block_window=6),
+        #     Pool(_id=5, strategy='PPS', fee_rate=3),
+        #     Pool(_id=6, strategy='FPPS', fee_rate=4),
+        #     Pool(_id=7, strategy='PPS+', fee_rate=1, block_window=10),
+        #     Pool(_id=8, strategy='PPS', fee_rate=3),
+        # ]
+
+        # # here as an example we define three nodes by assigning a unique id for each one + % of hash (computing) power
+        # NODES = [
+        #     Node(id=0, pool=POOLS[0], hashPower=7),
+        #     Node(id=1, pool=POOLS[1], hashPower=5),
+        #     Node(id=2, pool=POOLS[2], hashPower=5),
+        #     Node(id=3, pool=POOLS[6], hashPower=8),
+        #     Node(id=4, pool=POOLS[7], hashPower=5),
+        #     Node(id=5, pool=POOLS[4], hashPower=8),
+        #     Node(id=6, pool=POOLS[4], hashPower=5),
+        #     Node(id=7, pool=POOLS[3], hashPower=5),
+        #     Node(id=8, pool=POOLS[6], hashPower=5),
+        #     Node(id=9, pool=POOLS[0], hashPower=7, node_type='selfish', node_strategy='strategy_based'),
+        #     Node(id=10, pool=POOLS[3], hashPower=6, node_type='selfish', node_strategy='strategy_based'),
+        #     Node(id=11, pool=POOLS[4], hashPower=8, node_type='selfish', node_strategy='strategy_based'),
+        #     Node(id=12, pool=POOLS[5], hashPower=5, node_type='selfish', node_strategy='strategy_based'),
+        #     Node(id=13, pool=POOLS[7], hashPower=2),
+        #     Node(id=14, pool=POOLS[1], hashPower=3),
+        #     Node(id=15, hashPower=1),
+        #     Node(id=16, hashPower=1),
+        #     Node(id=17, hashPower=1),
+        #     Node(id=18, hashPower=2),
+        #     Node(id=19, pool=POOLS[5], hashPower=2),
+        #     Node(id=20, pool=POOLS[5], hashPower=2, node_type='selfish', node_strategy='strategy_based'),
+        #     Node(id=21, hashPower=1),
+        #     Node(id=22, pool=POOLS[8], hashPower=3, node_type='selfish', node_strategy='strategy_based'),
+        #     Node(id=23, pool=POOLS[8], hashPower=2),
+        #     Node(id=24, pool=POOLS[8], hashPower=1),
+        # ]
 
         ''' Simulation Parameters '''
-        simTime = 24 * 60 * 60  # the simulation length (in seconds)
-        Runs = 3  # Number of simulation runs
+        simTime = 10 * 24 * 60 * 60  # the simulation length (in seconds)
+        Runs = 1  # Number of simulation runs
 
     ''' Input configurations for Ethereum model '''
     if model == 2:
