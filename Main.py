@@ -49,13 +49,13 @@ def main():
                 node.pool.nodes.append(node)
                 node.pool.hashPower += node.hashPower
 
-        print()
+        print(p.sim_type)
         print('-'*10, f'Run: {i+1}', '-'*10)
         print('No. of Miners:', len(p.NODES))
         print('Total hash power:', hashPower)
         print('Pools:')
         for pool in p.POOLS:
-            print(' -', pool.id, [node.id for node in pool.nodes], pool.hashPower)
+            print(' -', pool.id, pool.strategy, 'Nodes:', [node.id for node in pool.nodes], 'Hash power:', pool.hashPower)
         print('\n')
 
         clock = 0  # set clock to 0 at the start of the simulation
@@ -98,7 +98,8 @@ def main():
             Node.resetState()  # reset all the states (blockchains) for all nodes in the network
             Pool.resetState()  # reset all pools in the network
 
-    fname = f"(Allverify)1day_{p.Bsize/1000000}M_{p.Tn/1000}K-{i}-{datetime.now()}.xlsx".replace(':', '_')
+    # fname = f"(Allverify)1day_{p.Bsize/1000000}M_{p.Tn/1000}K-{i}-{datetime.now()}.xlsx".replace(':', '_')
+    fname = f"{p.sim_type}_{int(p.simTime/(24*60*60))}days_{datetime.now()}.xlsx".replace(':', '_')
     # print all the simulation results in an excel file
     Statistics.print_to_excel(fname)
     # Statistics.reset2()  # reset profit results

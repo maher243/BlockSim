@@ -49,9 +49,9 @@ class Statistics:
             i = run_id * len(p.NODES) + m.id
             Statistics.profits[i] = [run_id, m.id]
             if m.pool:
-                Statistics.profits[i] += [m.pool_list, m.blocks_list, m.pool.strategy]
+                Statistics.profits[i] += [m.pool_list, m.blocks_list, m.pool.strategy, m.pool.fee_rate]
             else:
-                Statistics.profits[i] += [None, None, 'SOLO']
+                Statistics.profits[i] += [None, None, 'SOLO', None]
             if p.model== 0:
                 Statistics.profits[i].append("NA")
             else:
@@ -71,7 +71,7 @@ class Statistics:
 
     def pool_results(run_id):
         for pool in p.POOLS:
-            Statistics.pool_profits.append([run_id, pool.id, pool.strategy, pool.fee_rate, pool.hashPower, pool.blocks,
+            Statistics.pool_profits.append([run_id, pool.id, pool.strategy, pool.fee_rate, pool.block_window, pool.hashPower, pool.blocks,
             round(pool.blocks/Statistics.mainBlocks * 100, 2), pool.block_fee, pool.balance, pool.balance * p.Bprice])
 
 
@@ -96,10 +96,11 @@ class Statistics:
         df2.columns= ['Run ID', 'Total Blocks', 'Main Blocks', 'Uncle blocks', 'Uncle Rate', 'Stale Blocks', 'Stale Rate', '# transactions']
 
         df3 = pd.DataFrame(Statistics.profits)
-        df3.columns = ['Run ID', 'Miner ID', 'Pool IDs', 'Blocks per pool', 'Pool Strategy', '% Hash Power','# Mined Blocks', '% of main blocks', '# Uncle Blocks','% of uncles', 'Transaction Fee', 'Profit (in crypto)', 'Profit in $']
+        df3.columns = ['Run ID', 'Miner ID', 'Pool IDs', 'Blocks per pool', 'Pool Strategy', 'Pool Fee', '% Hash Power','# Mined Blocks', '% of main blocks', '# Uncle Blocks','% of uncles', 'Transaction Fee', 'Profit (in crypto)', 'Profit in $']
 
         df4 = pd.DataFrame(Statistics.pool_profits)
-        df4.columns = ['Run ID', 'Pool ID', 'Pool Strategy', '% Fee Rate', '% Hash Power', '# Mined Blocks', '% of main blocks', 'Transaction Fee', 'Profit (in crypto)', 'Profit in $']
+        if len(df4) > 0:
+            df4.columns = ['Run ID', 'Pool ID', 'Pool Strategy', '% Fee Rate', 'Block Window', '% Hash Power', '# Mined Blocks', '% of main blocks', 'Transaction Fee', 'Profit (in crypto)', 'Profit in $']
 
         df5 = pd.DataFrame(Statistics.chain)
         if p.model==2:

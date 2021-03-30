@@ -155,6 +155,9 @@ class Incentives:
                     pool_payout[pool] = mu
                     avg_payout += mu
 
+            if len(pool_payout) == 0:
+                continue
+
             avg_payout /= len(pool_payout)
             # print(avg_payout)
             # print([(pool.id, pool.strategy, pay) for pool, pay in pool_payout.items()])
