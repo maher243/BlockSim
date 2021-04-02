@@ -181,12 +181,19 @@ class Incentives:
                         node.pool.hash_power -= node.hash_power
                         node.pool.nodes.remove(node)
 
-                        if node.node_strategy == "strategy_based":
+                        if node.node_strategy == 'best'
+                            node.pool = max(pool_payout, key=pool_payout.get)
+
+                        elif node.node_strategy == 'best by strategy':
+                            strategy_pools = [pool for pool in sorted(pool_payout, key=pool_payout.get) if pool.strategy == node.pool.strategy]
+                            node.pool = strategy_pools
+
+                        elif node.node_strategy == "strategy based":
                             strategy_pools = [pool for pool in p.POOLS if pool.strategy == node.pool.strategy and pool != node.pool]
                             choosenPool = random.randint(0, len(strategy_pools) - 1)
                             node.pool = strategy_pools[choosenPool]
 
-                        elif node.node_strategy == "across_strategies":
+                        elif node.node_strategy == "across strategy":
                             strategy_pools = [pool for pool in p.POOLS if pool.strategy in ['PPS', 'PPLNS'] and pool != node.pool]
                             choosenPool = random.randint(0, len(strategy_pools) - 1)
                             node.pool = strategy_pools[choosenPool]
