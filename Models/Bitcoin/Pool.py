@@ -5,7 +5,7 @@ class Pool():
         self.strategy = strategy
         self.fee_rate = fee_rate
         self.nodes = []
-        self.hashPower = 0
+        self.hash_power = 0
         self.blocks = 0
         self.block_fee = 0
         self.balance = 0
@@ -18,4 +18,4 @@ class Pool():
             pool.block_fee = 0  # total transaction fee recieved from mined block
             pool.balance = 0  # to count all reward that a miner made
             pool.nodes = []
-            pool.hashPower = 0
+            pool.hash_power = 0

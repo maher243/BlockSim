@@ -3,9 +3,9 @@ from Models.Node import Node as BaseNode
 
 
 class Node(BaseNode):
-    def __init__(self, id, hashPower, pool=None, joinTime=0, node_type='honest', node_strategy=None):
+    def __init__(self, id, hashPower, pool=None, join_time=0, node_type='honest', node_strategy=None):
         '''Initialize a new miner named name with hashrate measured in hashes per second.'''
-        super().__init__(id, pool, joinTime)  # ,blockchain,transactionsPool,blocks,balance)
+        super().__init__(id, pool, join_time)  # ,blockchain,transactionsPool,blocks,balance)
         self.hashPower = hashPower
         self.node_type = node_type
         self.node_strategy = node_strategy  # random, sequential, strategy_based

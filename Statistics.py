@@ -71,7 +71,7 @@ class Statistics:
 
     def pool_results(run_id):
         for pool in p.POOLS:
-            Statistics.pool_profits.append([run_id, pool.id, pool.strategy, pool.fee_rate, pool.block_window, pool.hashPower, pool.blocks,
+            Statistics.pool_profits.append([run_id, pool.id, pool.strategy, pool.fee_rate, pool.block_window, pool.hash_power, pool.blocks,
             round(pool.blocks/Statistics.mainBlocks * 100, 2), pool.block_fee, pool.balance, pool.balance * p.Bprice])
 
 

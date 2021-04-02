@@ -46,7 +46,7 @@ class InputsConfig:
         Bsize = 1.0  # The block size in MB
         Bdelay = 0.42  # average block propogation delay in seconds, #Ref: https://bitslog.wordpress.com/2016/04/28/uncle-mining-an-ethereum-consensus-protocol-flaw/
         Breward = 6.25  # Reward for mining a block
-        Bprice = 54000
+        Bprice = 58000
         jump_threshold = 0.02
 
         ''' Transaction Parameters '''
@@ -55,7 +55,7 @@ class InputsConfig:
         Tn = 10  # The rate of the number of transactions to be created per second
         # The average transaction propagation delay in seconds (Only if Full technique is used)
         Tdelay = 5.1
-        Tfee = 0.000062  # The average transaction fee
+        Tfee = 0.00029  # The average transaction fee
         Tsize = 0.000546  # The average transaction size  in MB
 
         ''' Node Parameters '''
