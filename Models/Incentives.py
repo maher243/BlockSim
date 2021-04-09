@@ -28,7 +28,7 @@ class Incentives:
 
 
             windows = {}
-            cumulative_times = {}
+            cumulative_shares = {}
             # calculating sum of shares for PPLNS and PPS+ pools since the block window, or the join time
             for pool in p.POOLS:
                 if pool.strategy not in ['PPLNS', 'PPS+']:
@@ -46,7 +46,7 @@ class Incentives:
                     shares += (current_time - latest_window_time) * pool_node.hashPower
 
                 windows[pool] = window_timestamp
-                cumulative_times[pool] = shares
+                cumulative_shares[pool] = shares
 
 
             for m in p.NODES:
@@ -65,6 +65,8 @@ class Incentives:
                     reward = (100 - m.pool.fee_rate)/100 * reward
                     m.pool.balance -= reward
                     m.balance += reward
+                    m.balance_list[-1] += reward
+                    m.reward_list[-1] += reward
 
                     if miner == m:
                         # pool keeps transaction fee
@@ -104,12 +106,15 @@ class Incentives:
                         for node in miner_pool.nodes:
 
                             latest_window_time = max(node.join_time, windows[miner_pool])
-                            frac = (current_time - latest_window_time) * node.hashPower/cumulative_times[miner_pool]
+                            frac = (current_time - latest_window_time) * node.hashPower/cumulative_shares[miner_pool]
                             # print(frac)
                             # transaction fee and reward distributed as per fraction of time and hashpower spent
                             node.balance += frac * reward
                             node.fee += frac * bc.fee
                             node.balance += frac * bc.fee
+
+                            node.reward_list[-1] + frac * reward
+                            node.balance_list[-1] += frac * (bc.fee + reward)
 
 
                 # elif m.pool.strategy == 'Proportional':
@@ -143,7 +148,7 @@ class Incentives:
                         for node in miner_pool.nodes:
 
                             latest_window_time = max(node.join_time, windows[miner_pool])
-                            frac = (current_time - latest_window_time) * node.hashPower/cumulative_times[miner_pool]
+                            frac = (current_time - latest_window_time) * node.hashPower/cumulative_shares[miner_pool]
                             # print(frac)
                             # transaction fee shared by PPLNS method as per fraction of time and hashpower
                             node.fee += frac * bc.fee
@@ -175,17 +180,18 @@ class Incentives:
 
                     mu = pool_payout[node.pool]
 
+                    # avg2 = (avg_payout - mu)/(len(pool_payout)-1)
                     if mu < avg_payout and random.random() < (avg_payout - mu)/avg_payout:
                         print(node.id, ':', node.pool.id, end=' ')
 
-                        node.pool.hash_power -= node.hash_power
+                        node.pool.hash_power -= node.hashPower
                         node.pool.nodes.remove(node)
 
                         if node.node_strategy == 'best':
                             node.pool = max(pool_payout, key=pool_payout.get)
 
                         elif node.node_strategy == 'best by strategy':
-                            strategy_pools = [pool for pool in sorted(pool_payout, key=pool_payout.get) if pool.strategy == node.pool.strategy]
+                            strategy_pools = [pool for pool in sorted(pool_payout, key=pool_payout.get) if pool.strategy == node.pool.strategy and pool != node.pool]
                             node.pool = strategy_pools[0]
 
                         elif node.node_strategy == "strategy based":
@@ -193,7 +199,7 @@ class Incentives:
                             choosenPool = random.randint(0, len(strategy_pools) - 1)
                             node.pool = strategy_pools[choosenPool]
 
-                        elif node.node_strategy == "across strategy":
+                        elif node.node_strategy == "random":
                             strategy_pools = [pool for pool in p.POOLS if pool.strategy in ['PPS', 'PPLNS'] and pool != node.pool]
                             choosenPool = random.randint(0, len(strategy_pools) - 1)
                             node.pool = strategy_pools[choosenPool]
@@ -201,8 +207,10 @@ class Incentives:
                         # c.global_chain[i-1].timestamp + 0.432 * random.expovariate(hashPower * 1/p.Binterval)  # TODO improve time assignment
                         # TODO random delay
                         node.join_time = current_time
-                        node.pool.hash_power += node.hash_power
+                        node.pool.hash_power += node.hashPower
                         node.pool.nodes.append(node)
                         node.pool_list.append(node.pool.id)
                         print('--->', node.pool.id, [n.id for n in node.pool.nodes])
                         node.blocks_list.append(0)
+                        node.balance_list.append(0)
+                        node.reward_list.append(0)

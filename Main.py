@@ -40,23 +40,26 @@ elif p.model == 0:
 
 def main():
     for i in range(p.Runs):
+        print('-'*10, f'Run: {i+1}', '-'*10)
+        print(p.sim_type)
+        print('No. of Miners:', len(p.NODES))
 
         hash_power = 0
         # Giving every pool a reference to the nodes it contains. Also, update the total hashrate of a pool.
+        print('SOLO Nodes: ', end='')
         for node in p.NODES:
             hash_power += node.hashPower
             if node.pool:
                 node.pool.nodes.append(node)
                 node.pool.hash_power += node.hashPower
+            else:
+                print(node.id, end=', ')
+        print()
 
-        print(p.sim_type)
-        print('-'*10, f'Run: {i+1}', '-'*10)
-        print('No. of Miners:', len(p.NODES))
-        print('Total hash power:', hash_power)
         print('Pools:')
         for pool in p.POOLS:
-            print(' -', pool.id, pool.strategy, 'Nodes:', [node.id for node in pool.nodes], 'Hash power:', pool.hash_power)
-        print('\n')
+            print(' -', pool.id, pool.strategy, 'Fee Rate:', pool.fee_rate, 'Nodes:', [node.id for node in pool.nodes], 'Hash power:', pool.hash_power)
+        print('Total hash power:', hash_power, '\n')
 
         clock = 0  # set clock to 0 at the start of the simulation
         if p.hasTrans:

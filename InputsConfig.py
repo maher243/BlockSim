@@ -80,18 +80,158 @@ class InputsConfig:
             # 'BTCC': 'PPS'
         }
 
+        ''' Simulation Parameters '''
+        simTime = 50 * 24 * 60 * 60  # the simulation length (in seconds)
+        Runs = 1  # Number of simulation runs
+
         NODES = []
         POOLS = []
-        sim_type = 'baseline'
-        for pool, (strat, fee) in pool_types.items():
-            if strat in ['PPLNS', 'PPS+']:
-                POOLS.append(Pool(_id=pool, strategy=strat, fee_rate=fee, block_window=8))
-            else:
-                POOLS.append(Pool(_id=pool, strategy=strat, fee_rate=fee))
 
-        for i, pool in enumerate(POOLS):
-            NODES.append(
-            Node(id=i, pool=pool, hashPower=12.5))
+        i = 0
+        j = 0
+        base_rate = {'PPS': 2.5, 'FPPS': 2.5, 'PPS+': 2.5, 'PPLNS': 0}
+
+
+
+        sim_type = 'honest'
+        hopping = False
+        for pool_type in ['SOLO', 'PPS', 'FPPS', 'PPLNS', 'PPS+']:
+
+            if pool_type == 'SOLO':
+                hp = 12
+                for _ in range(10):
+                    hp /= 2
+                    NODES.append(Node(id=j, hashPower=hp))
+                    j += 1
+            else:
+                rate = base_rate[pool_type]
+
+                if pool_type in ['PPS', 'FPPS']:
+                    for f in range(4):
+                        hp = 4
+
+                        pool = Pool(_id=i, strategy=pool_type, fee_rate=rate)
+                        POOLS.append(pool)
+
+                        i += 1
+                        rate += 0.5
+
+                        n = random.randint(7, 10)
+                        for k in range(n):
+                            hp /= 2
+                            NODES.append(Node(id=j, pool=pool, hashPower=hp))
+                            j += 1
+
+                else:
+                    for w in range(4):
+                        if rate in [1, 3]:
+                            for bw in [6, 8, 10, 12]:
+                                hp = 4
+
+                                pool = Pool(_id=i, strategy=pool_type, fee_rate=rate, block_window=bw)
+                                POOLS.append(pool)
+                                i += 1
+
+                                n = random.randint(7, 10)
+                                for k in range(n):
+                                    hp /= 2
+                                    NODES.append(Node(id=j, pool=pool, hashPower=hp))
+                                    j += 1
+
+                            rate += 0.5
+
+                        else:
+                            hp = 4
+
+                            pool = Pool(_id=i, strategy=pool_type, fee_rate=rate, block_window=8)
+                            POOLS.append(pool)
+
+                            i += 1
+                            rate += 0.5
+
+                            n = random.randint(7, 10)
+                            for k in range(n):
+                                hp /= 2
+                                NODES.append(Node(id=j, pool=pool, hashPower=hp))
+                                j += 1
+
+
+
+
+        # sim_type = 'hopping'
+        # hopping = True
+        # for pool_type in ['PPS', 'PPLNS']:
+
+        #     # if pool_type == 'SOLO':
+        #     #     hp = 12
+        #     #     for _ in range(10):
+        #     #         hp /= 2
+        #     #         NODES.append(Node(id=j, hashPower=hp))
+        #     #         j += 1
+        #     # else:
+        #     rate = base_rate[pool_type]
+
+        #     if pool_type in ['PPS']:
+        #         for f in range(4):
+        #             hp = 5
+
+        #             pool = Pool(_id=i, strategy=pool_type, fee_rate=rate)
+        #             POOLS.append(pool)
+        #             i += 1
+        #             rate += 0.5
+
+        #             n = random.randint(7, 10)
+        #             for k in range(n):
+        #                 hp /= 2
+        #                 r = random.random()
+        #                 if r < 0.25:
+        #                     NODES.append(Node(id=j, pool=pool, hashPower=hp, node_type='selfish', node_strategy='best'))
+        #                 elif r < 0.5:
+        #                     NODES.append(Node(id=j, pool=pool, hashPower=hp, node_type='selfish', node_strategy='strategy based'))
+        #                 elif r < 0.75:
+        #                     NODES.append(Node(id=j, pool=pool, hashPower=hp, node_type='selfish', node_strategy='random'))
+        #                 else:
+        #                     NODES.append(Node(id=j, pool=pool, hashPower=hp))
+        #                 j += 1
+
+        #     else:
+        #         for w in range(4):
+        #             for bw in [6, 8, 10, 12]:
+        #                 hp = 5
+
+        #                 pool = Pool(_id=i, strategy=pool_type, fee_rate=rate, block_window=bw)
+        #                 POOLS.append(pool)
+        #                 i += 1
+
+        #                 n = random.randint(7, 10)
+        #                 for k in range(n):
+        #                     hp /= 2
+        #                     r = random.random()
+        #                     if r < 0.25:
+        #                         NODES.append(Node(id=j, pool=pool, hashPower=hp, node_type='selfish', node_strategy='best'))
+        #                     elif r < 0.5:
+        #                         NODES.append(Node(id=j, pool=pool, hashPower=hp, node_type='selfish', node_strategy='strategy based'))
+        #                     elif r < 0.75:
+        #                         NODES.append(Node(id=j, pool=pool, hashPower=hp, node_type='selfish', node_strategy='random'))
+        #                     else:
+        #                         NODES.append(Node(id=j, pool=pool, hashPower=hp))
+        #                     j += 1
+
+        #             rate += 0.5
+
+
+
+
+        # sim_type = 'baseline'
+        # for pool, (strat, fee) in pool_types.items():
+        #     if strat in ['PPLNS', 'PPS+']:
+        #         POOLS.append(Pool(_id=pool, strategy=strat, fee_rate=fee, block_window=8))
+        #     else:
+        #         POOLS.append(Pool(_id=pool, strategy=strat, fee_rate=fee))
+
+        # for i, pool in enumerate(POOLS):
+        #     NODES.append(
+        #     Node(id=i, pool=pool, hashPower=12.5))
 
         # sim_type = 'solo'
 
@@ -202,10 +342,6 @@ class InputsConfig:
         #     Node(id=23, pool=POOLS[8], hashPower=2),
         #     Node(id=24, pool=POOLS[8], hashPower=1),
         # ]
-
-        ''' Simulation Parameters '''
-        simTime = 10 * 24 * 60 * 60  # the simulation length (in seconds)
-        Runs = 1  # Number of simulation runs
 
     ''' Input configurations for Ethereum model '''
     if model == 2:

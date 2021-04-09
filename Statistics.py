@@ -47,11 +47,17 @@ class Statistics:
 
         for m in p.NODES:
             i = run_id * len(p.NODES) + m.id
-            Statistics.profits[i] = [run_id, m.id]
-            if m.pool:
-                Statistics.profits[i] += [m.pool_list, m.blocks_list, m.pool.strategy, m.pool.fee_rate]
+            Statistics.profits[i] = [run_id, m.id, m.node_type]
+            if p.hopping:
+                if m.pool:
+                    Statistics.profits[i] += [m.node_strategy, m.pool_list, m.blocks_list, m.reward_list, m.balance_list]
+                else:
+                    Statistics.profits[i] += [m.node_strategy, None, None]
             else:
-                Statistics.profits[i] += [None, None, 'SOLO', None]
+                if m.pool:
+                    Statistics.profits[i] += [m.pool.id, m.pool.strategy, m.pool.fee_rate]
+                else:
+                    Statistics.profits[i] += [None, 'SOLO', None]
             if p.model== 0:
                 Statistics.profits[i].append("NA")
             else:
@@ -96,7 +102,10 @@ class Statistics:
         df2.columns= ['Run ID', 'Total Blocks', 'Main Blocks', 'Uncle blocks', 'Uncle Rate', 'Stale Blocks', 'Stale Rate', '# transactions']
 
         df3 = pd.DataFrame(Statistics.profits)
-        df3.columns = ['Run ID', 'Miner ID', 'Pool IDs', 'Blocks per pool', 'Pool Strategy', 'Pool Fee', '% Hash Power','# Mined Blocks', '% of main blocks', '# Uncle Blocks','% of uncles', 'Transaction Fee', 'Profit (in crypto)', 'Profit in $']
+        if p.hopping:
+            df3.columns = ['Run ID', 'Miner ID', 'Miner Type', 'Hopping Strategy', 'Pool IDs', 'Blocks per pool', 'Reward per pool', 'Balance per pool', '% Hash Power','# Mined Blocks', '% of main blocks', '# Uncle Blocks','% of uncles', 'Transaction Fee', 'Profit (in crypto)', 'Profit in $']
+        else:
+            df3.columns = ['Run ID', 'Miner ID', 'Miner Type', 'Pool Id', 'Pool Strategy', 'Pool Fee', '% Hash Power','# Mined Blocks', '% of main blocks', '# Uncle Blocks','% of uncles', 'Transaction Fee', 'Profit (in crypto)', 'Profit in $']
 
         df4 = pd.DataFrame(Statistics.pool_profits)
         if len(df4) > 0:

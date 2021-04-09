@@ -13,6 +13,8 @@ class Node(BaseNode):
             self.original_pool = self.pool
             self.pool_list = [pool.id]
             self.blocks_list = [0]
+            self.reward_list = [0]
+            self.balance_list = [0]
 
     def resetState():
         from InputsConfig import InputsConfig as p
@@ -26,3 +28,5 @@ class Node(BaseNode):
                 node.pool = node.original_pool
                 node.pool_list = [node.original_pool.id]
                 node.blocks_list = [0]
+                node.reward_list = [0]
+                node.balance_list = [0]
