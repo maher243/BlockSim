@@ -101,12 +101,14 @@ def main():
             Node.resetState()  # reset all the states (blockchains) for all nodes in the network
             Pool.resetState()  # reset all pools in the network
 
-    # fname = f"(Allverify)1day_{p.Bsize/1000000}M_{p.Tn/1000}K-{i}-{datetime.now()}.xlsx".replace(':', '_')
+    # set file name for results
     fname = f"{p.sim_type}_{int(p.simTime/(24*60*60))}days_{datetime.now()}.xlsx".replace(':', '_')
+    # fname = f"(Allverify)1day_{p.Bsize/1000000}M_{p.Tn/1000}K-{i}-{datetime.now()}.xlsx".replace(':', '_')
     # print all the simulation results in an excel file
     Statistics.print_to_excel(fname)
     # Statistics.reset2()  # reset profit results
 
 ######################################################## Run Main method #####################################################################
+
 if __name__ == '__main__':
     main()

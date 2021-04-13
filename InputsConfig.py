@@ -1,4 +1,6 @@
 import random
+from Models.Bitcoin.Pool import Pool
+from Models.Bitcoin.Node import Node
 
 class InputsConfig:
 
@@ -60,8 +62,6 @@ class InputsConfig:
 
         ''' Node Parameters '''
         Nn = 3  # the total number of nodes in the network
-        from Models.Bitcoin.Node import Node
-        from Models.Bitcoin.Pool import Pool
 
         pool_types = {
             'F2Pool': ('PPS+', 2),
@@ -81,145 +81,122 @@ class InputsConfig:
         }
 
         ''' Simulation Parameters '''
-        simTime = 50 * 24 * 60 * 60  # the simulation length (in seconds)
+        simTime = 1 * 24 * 60 * 60  # the simulation length (in seconds)
         Runs = 1  # Number of simulation runs
 
-        NODES = []
-        POOLS = []
+        # choose which sim to run
+        sim_type = 'honest'
+        # sim_type = 'hopping'
 
-        i = 0
-        j = 0
+        i = 0  # counter to track pool objects
+        j = 0  # counter to track node objects
+        NODES = []  # list of node objects
+        POOLS = []  # list of pool objects
+
+        # function to assign nodes with decreasing hash power to pools
+        def create_nodes(node_id, pool, hash_power, NODES=NODES):
+            n = random.randint(7, 10)
+            for _ in range(n):
+                hash_power /= 2
+                NODES.append(Node(id=node_id, pool=pool, hashPower=hash_power))
+                node_id += 1
+            return node_id
+
+        # function to create miner nodes for the selfish sim
+        def create_selfish_nodes(node_id, pool, hash_power, NODES=NODES):
+            n = random.randint(7, 10)
+            for _ in range(n):
+                hash_power /= 2
+                r = random.random()
+                # each hopping strategy (honest, best, strategy-based, random) has a 25% chance of being adopted by a node
+                if r < 0.25:
+                    NODES.append(Node(id=node_id, pool=pool, hashPower=hash_power, node_type='selfish', node_strategy='best'))
+                elif r < 0.5:
+                    NODES.append(Node(id=node_id, pool=pool, hashPower=hash_power, node_type='selfish', node_strategy='strategy based'))
+                elif r < 0.75:
+                    NODES.append(Node(id=node_id, pool=pool, hashPower=hash_power, node_type='selfish', node_strategy='random'))
+                else:
+                    NODES.append(Node(id=node_id, pool=pool, hashPower=hash_power))
+                node_id += 1
+            return node_id
+
+        # initialising base fee rates
         base_rate = {'PPS': 2.5, 'FPPS': 2.5, 'PPS+': 2.5, 'PPLNS': 0}
 
+        if sim_type == 'honest':
+            hopping = False
+            # for each kind of strategy instantiate node and pool objects
+            for pool_type in ['SOLO', 'PPS', 'FPPS', 'PPLNS', 'PPS+']:
 
-
-        sim_type = 'honest'
-        hopping = False
-        for pool_type in ['SOLO', 'PPS', 'FPPS', 'PPLNS', 'PPS+']:
-
-            if pool_type == 'SOLO':
-                hp = 12
-                for _ in range(10):
-                    hp /= 2
-                    NODES.append(Node(id=j, hashPower=hp))
-                    j += 1
-            else:
-                rate = base_rate[pool_type]
-
-                if pool_type in ['PPS', 'FPPS']:
-                    for f in range(4):
-                        hp = 4
-
-                        pool = Pool(_id=i, strategy=pool_type, fee_rate=rate)
-                        POOLS.append(pool)
-
-                        i += 1
-                        rate += 0.5
-
-                        n = random.randint(7, 10)
-                        for k in range(n):
-                            hp /= 2
-                            NODES.append(Node(id=j, pool=pool, hashPower=hp))
-                            j += 1
-
+                if pool_type == 'SOLO':
+                    hp = 12
+                    # 10 solo miners with monotonically decreasing hash rates
+                    for _ in range(10):
+                        hp /= 2
+                        NODES.append(Node(id=j, hashPower=hp))
+                        j += 1
                 else:
-                    for w in range(4):
-                        if rate in [1, 3]:
-                            for bw in [6, 8, 10, 12]:
-                                hp = 4
+                    rate = base_rate[pool_type]
 
-                                pool = Pool(_id=i, strategy=pool_type, fee_rate=rate, block_window=bw)
-                                POOLS.append(pool)
-                                i += 1
-
-                                n = random.randint(7, 10)
-                                for k in range(n):
-                                    hp /= 2
-                                    NODES.append(Node(id=j, pool=pool, hashPower=hp))
-                                    j += 1
-
-                            rate += 0.5
-
-                        else:
+                    # 4 pools for PPS and FPPS strategies each
+                    if pool_type in ['PPS', 'FPPS']:
+                        for f in range(4):
                             hp = 4
-
-                            pool = Pool(_id=i, strategy=pool_type, fee_rate=rate, block_window=8)
+                            pool = Pool(_id=i, strategy=pool_type, fee_rate=rate)
                             POOLS.append(pool)
-
+                            j = create_nodes(j, pool, hp)
                             i += 1
                             rate += 0.5
 
-                            n = random.randint(7, 10)
-                            for k in range(n):
-                                hp /= 2
-                                NODES.append(Node(id=j, pool=pool, hashPower=hp))
-                                j += 1
 
+                    else:
+                        for w in range(4):
+                            if rate in [1, 3]:
+                                # for PPS+ and PPLNS pools we vary block window as well
+                                for bw in [6, 8, 10, 12]:
+                                    hp = 4
+                                    pool = Pool(_id=i, strategy=pool_type, fee_rate=rate, block_window=bw)
+                                    POOLS.append(pool)
+                                    j = create_nodes(j, pool, hp)
+                                    i += 1
+                                rate += 0.5
 
+                            else:
+                                hp = 4
+                                pool = Pool(_id=i, strategy=pool_type, fee_rate=rate, block_window=8)
+                                POOLS.append(pool)
+                                j = create_nodes(j, pool, hp)
+                                i += 1
+                                rate += 0.5
 
+        else:
+            hopping = True
+            # hopping sim only considers PPS and PPLNS
+            for pool_type in ['PPS', 'PPLNS']:
 
-        # sim_type = 'hopping'
-        # hopping = True
-        # for pool_type in ['PPS', 'PPLNS']:
+                # using the same base fee rates as the honest sim
+                rate = base_rate[pool_type]
 
-        #     # if pool_type == 'SOLO':
-        #     #     hp = 12
-        #     #     for _ in range(10):
-        #     #         hp /= 2
-        #     #         NODES.append(Node(id=j, hashPower=hp))
-        #     #         j += 1
-        #     # else:
-        #     rate = base_rate[pool_type]
+                # create PPS pools of varying fee rate
+                if pool_type in ['PPS']:
+                    for f in range(4):
+                        hp = 5
+                        pool = Pool(_id=i, strategy=pool_type, fee_rate=rate)
+                        POOLS.append(pool)
+                        j = create_selfish_nodes(j, pool, hp)
+                        i += 1
+                        rate += 0.5
 
-        #     if pool_type in ['PPS']:
-        #         for f in range(4):
-        #             hp = 5
-
-        #             pool = Pool(_id=i, strategy=pool_type, fee_rate=rate)
-        #             POOLS.append(pool)
-        #             i += 1
-        #             rate += 0.5
-
-        #             n = random.randint(7, 10)
-        #             for k in range(n):
-        #                 hp /= 2
-        #                 r = random.random()
-        #                 if r < 0.25:
-        #                     NODES.append(Node(id=j, pool=pool, hashPower=hp, node_type='selfish', node_strategy='best'))
-        #                 elif r < 0.5:
-        #                     NODES.append(Node(id=j, pool=pool, hashPower=hp, node_type='selfish', node_strategy='strategy based'))
-        #                 elif r < 0.75:
-        #                     NODES.append(Node(id=j, pool=pool, hashPower=hp, node_type='selfish', node_strategy='random'))
-        #                 else:
-        #                     NODES.append(Node(id=j, pool=pool, hashPower=hp))
-        #                 j += 1
-
-        #     else:
-        #         for w in range(4):
-        #             for bw in [6, 8, 10, 12]:
-        #                 hp = 5
-
-        #                 pool = Pool(_id=i, strategy=pool_type, fee_rate=rate, block_window=bw)
-        #                 POOLS.append(pool)
-        #                 i += 1
-
-        #                 n = random.randint(7, 10)
-        #                 for k in range(n):
-        #                     hp /= 2
-        #                     r = random.random()
-        #                     if r < 0.25:
-        #                         NODES.append(Node(id=j, pool=pool, hashPower=hp, node_type='selfish', node_strategy='best'))
-        #                     elif r < 0.5:
-        #                         NODES.append(Node(id=j, pool=pool, hashPower=hp, node_type='selfish', node_strategy='strategy based'))
-        #                     elif r < 0.75:
-        #                         NODES.append(Node(id=j, pool=pool, hashPower=hp, node_type='selfish', node_strategy='random'))
-        #                     else:
-        #                         NODES.append(Node(id=j, pool=pool, hashPower=hp))
-        #                     j += 1
-
-        #             rate += 0.5
-
-
+                else:
+                    # in case of PPLNS, we vary the block window as well
+                    for w in range(4):
+                        for bw in [6, 8, 10, 12]:
+                            hp = 5
+                            pool = Pool(_id=i, strategy=pool_type, fee_rate=rate, block_window=bw)
+                            POOLS.append(pool)
+                            j = create_selfish_nodes(j, pool, hp)
+                            i += 1
+                        rate += 0.5
 
 
         # sim_type = 'baseline'
