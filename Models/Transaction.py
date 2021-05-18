@@ -112,7 +112,7 @@ class FullTransaction():
         # Fill each pending list. This is for transaction propogation
         for i in p.NODES:
             if tx.sender != i.id:
-                t= tx
+                t= copy.deepcopy(tx)
                 t.timestamp[1] = t.timestamp[1] + Network.tx_prop_delay() # transaction propogation delay in seconds
                 i.transactionsPool.append(t)
 
