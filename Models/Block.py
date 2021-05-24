@@ -1,5 +1,5 @@
 class Block(object):
-    
+
     """ Defines the base Block model.
 
     :param int depth: the index of the block in the local blockchain ledger (0 for genesis block)
@@ -27,3 +27,4 @@ class Block(object):
         self.miner = miner
         self.transactions = transactions or []
         self.size = size
+        self.fee = 0

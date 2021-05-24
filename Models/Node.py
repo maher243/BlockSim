@@ -10,11 +10,12 @@ class Node(object):
         :param int blocks: the total number of blocks mined in the main chain
         :param int balance: the amount of cryptocurrencies a node has
     """
-    def __init__(self,id):
+    def __init__(self, id):
         self.id= id
         self.blockchain= []
         self.transactionsPool= []
         self.blocks= 0#
+        self.fee = 0
         self.balance= 0
 
     # Generate the Genesis block and append it to the local blockchain for all nodes
@@ -31,11 +32,12 @@ class Node(object):
     def blockchain_length(self):
         return len(self.blockchain)-1
 
-    # reset the state of blockchains for all nodes in the network (before starting the next run) 
+    # reset the state of blockchains for all nodes in the network (before starting the next run)
     def resetState():
         from InputsConfig import InputsConfig as p
         for node in p.NODES:
             node.blockchain= [] # create an array for each miner to store chain state locally
             node.transactionsPool= []
             node.blocks=0 # total number of blocks mined in the main chain
+            node.fee = 0  # total transaction fee recieved from mined block
             node.balance= 0 # to count all reward that a miner made

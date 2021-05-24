@@ -1,8 +1,6 @@
 from InputsConfig import InputsConfig as p
 import random
-from Models.Block import Block
 from Event import Event, Queue
-
 if p.model == 2:
     from Models.Ethereum.Block import Block
 elif p.model == 3:
