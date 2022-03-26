@@ -80,11 +80,11 @@ def main():
                 p.Bsize/1000000, p.Tn/1000)
             # print all the simulation results in an excel file
             Statistics.print_to_excel(fname)
-            fname = "(Allverify)1day_{0}M_{1}K.xlsx".format(
+        fname = "(Allverify)1day_{0}M_{1}K.xlsx".format(
                 p.Bsize/1000000, p.Tn/1000)
-            # print all the simulation results in an excel file
-            Statistics.print_to_excel(fname)
-            Statistics.reset2()  # reset profit results
+        # print all the simulation results in an excel file
+        Statistics.print_to_excel(fname)
+        Statistics.reset2()  # reset profit results
 
 
 ######################################################## Run Main method #####################################################################
